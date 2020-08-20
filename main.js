@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function onFilterChanged() {
-  var changedRows = gridOptions.api.forEachNodeAfterFilterAndSort()
+  var changedRows = gridOptions.api.afterDataChange()
   changedRows.reduce((acc, cur) => acc + cur.cost, 0);
   document.querySelector('#myTotal').innerHTML = total;
 }
