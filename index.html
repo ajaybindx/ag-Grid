@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Ag-Grid Basic Example</title>
+    <style media="only screen">
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        html {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 0;
+            overflow: auto;
+        }
+
+        body {
+            padding: 1rem;
+            overflow: auto;
+        }
+    </style>
+    <!-- <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script> -->
+
+    <!-- <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script> -->
+    <script src="https://unpkg.com/@ag-grid-community/all-modules@23.2.0/dist/ag-grid-community.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-alpine.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Hello from ag-grid!</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <label for="TOTAL"> TOTAL : </label>
+        </div>
+        <div class="col-md-3">
+            <span id="myTotal"></span>
+            <br>
+        </div>
+    </div>
+    <div id="myGrid" style="height: 600px; width:800px;" class="ag-theme-alpine"></div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
