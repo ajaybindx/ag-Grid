@@ -86,8 +86,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function onFilterChanged() {
-  var changedRows = gridOptions.api.afterDataChange()
-  changedRows.reduce((acc, cur) => acc + cur.cost, 0);
+  var nodes = [];
+  gridOptions.api.forEachNodeAfterFilterAndSort(function (node) {
+    array.push(node.data);
+  });
+  var total = nodes.reduce((a, c) => a + c.cost, 0);
   document.querySelector('#myTotal').innerHTML = total;
 }
 
@@ -128,16 +131,16 @@ function onSelectionChanged() {
 
 
 
-// Option 2: register aggFunc to grid called 'abc', then reference by name
-gridOptions.api.addAggFunc('mySum', myCustomAggFunc);
-colDefCost.aggFunc = 'mySum';
+// // Option 2: register aggFunc to grid called 'abc', then reference by name
+// gridOptions.api.addAggFunc('mySum', myCustomAggFunc);
+// colDefCost.aggFunc = 'mySum';
 
 
-// this is the function 2 and 3 above are using
-function myCustomAggFunc(values) {
-  var sum = 0;
-  values.forEach(function (value) {
-    sum += value;
-  });
-  return sum;
-}
+// // this is the function 2 and 3 above are using
+// function myCustomAggFunc(values) {
+//   var sum = 0;
+//   values.forEach(function (value) {
+//     sum += value;
+//   });
+//   return sum;
+// }
