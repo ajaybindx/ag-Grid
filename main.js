@@ -12,6 +12,39 @@ var columnDefs = [{
     //rowGroup: true
   },
   {
+    headerName: "Date",
+    field: "date",
+    sortable: true,
+    filter: 'agDateColumnFilter',
+    filterParams: {
+      // provide comparator function
+      comparator: function(filterLocalDateAtMidnight, cellValue) {
+          var dateAsString = cellValue;
+
+          if (dateAsString == null) {
+              return 0;
+          }
+
+          // In the example application, dates are stored as dd/mm/yyyy
+          // We create a Date object for comparison against the filter date
+          var dateParts = dateAsString.split('/');
+          var day = Number(dateParts[2]);
+          var month = Number(dateParts[1]) - 1;
+          var year = Number(dateParts[0]);
+          var cellDate = new Date(day, month, year);
+
+          // Now that both parameters are Date objects, we can compare
+          if (cellDate < filterLocalDateAtMidnight) {
+              return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+              return 1;
+          } else {
+              return 0;
+          }
+      }
+  }
+  },
+  {
     headerName: "Age",
     field: "age",
     sortable: true,
@@ -22,13 +55,9 @@ var columnDefs = [{
     field: "cost",
     sortable: true,
     filter: 'agNumberColumnFilter'
-
-
-
-
-    // aggFunc: mySum,
-    // enableValue: true
   }
+  
+
 ];
 
 // specify the data
@@ -36,32 +65,59 @@ var rowData = [{
     name: 'Pawan',
     department: 'Sales',
     age: 25,
-    cost: 20000
+    cost: 20000,
+    date:'10/8/2020'
   },
   {
     name: 'Sid',
     department: 'Prodction',
     age: 25,
-    cost: 25000
+    cost: 25000,
+    date:'15/8/2020'
   },
   {
     name: 'Abhay',
     department: 'Sales',
     age: 24,
-    cost: 10000
+    cost: 10000,
+    date:'10/7/2020'
   },
   {
     name: 'Rahul',
     department: 'Prodction',
     age: 27,
-    cost: 25000
+    cost: 25000,
+    date:'17/5/2020'
   },
   {
     name: 'Ajay',
     department: 'Sales',
     age: 26,
-    cost: 10000
+    cost: 10000,
+    date:'10/6/2020'
+  },
+  {
+    name: 'AAA',
+    department: 'Sales',
+    age: 26,
+    cost: 10000,
+    date:'10/5/2020'
+  },
+  {
+    name: 'BBB',
+    department: 'Prodction',
+    age: 26,
+    cost: 10000,
+    date:'10/8/2020'
+  },
+  {
+    name: 'CCC',
+    department: 'Sales',
+    age: 26,
+    cost: 10000,
+    date:'10/7/2020'
   }
+
 ];
 
 // let the grid know which columns and what data to use
@@ -69,12 +125,11 @@ var gridOptions = {
   columnDefs: columnDefs,
   rowData: rowData,
   rowSelection: 'multiple',
-  onSelectionChanged: onSelectionChanged,
-  rowMultiSelectWithClick: true,
-  onFilterChanged: function (e) {
-    console.log('onFilterChanged', e);
-    console.log('gridApi.getFilterModel() =>', e.api.getFilterModel());
-  }
+  // groupIncludeFooter: true,
+  
+  // onSelectionChanged: onSelectionChanged,
+  // rowMultiSelectWithClick: true,
+  onFilterChanged: onFilterChanged
 
 
 };
@@ -86,11 +141,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function onFilterChanged() {
-  var nodes = [];
+  var array = [];
   gridOptions.api.forEachNodeAfterFilterAndSort(function (node) {
     array.push(node.data);
   });
-  var total = nodes.reduce((a, c) => a + c.cost, 0);
+  var total = array.reduce((a, c) => a + c.cost, 0);
   document.querySelector('#myTotal').innerHTML = total;
 }
 
