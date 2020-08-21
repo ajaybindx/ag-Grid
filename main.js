@@ -123,6 +123,11 @@ var rowData = [{
 // let the grid know which columns and what data to use
 var gridOptions = {
   columnDefs: columnDefs,
+  defaultColDef: {
+    resizable: true,
+    minWidth: 80,
+    flex: 1
+},
   rowData: rowData,
   rowSelection: 'multiple',
   // groupIncludeFooter: true,
