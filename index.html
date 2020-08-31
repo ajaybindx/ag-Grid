@@ -65,7 +65,7 @@
     </style>
 
 
-    <div class="example-wrapper ag-theme-alpine" >
+    <div class="example-wrapper ag-theme-alpine">
         <div id="myGridTop" class="top"></div>
         <div id="myGridBottom" class="bottom"></div>
     </div>
@@ -76,7 +76,7 @@
 
         var gridOptionsTop = {};
         var gridOptionsBottom = {};
-        // gridOptionsBottom.columnDefs=gridOptionsTop.columnDefs
+
 
         // this is the grid options for the bottom grid
         // setup the grid after the page has finished loading
@@ -85,58 +85,105 @@
             google.script.run.withSuccessHandler(onSuccess).myFunction();
 
             function onSuccess(data) {
-               // console.log(data)
+                // console.log(data)
                 gridOptionsTop = JSON.parse(data);
+
                 gridOptionsTop.onFilterChanged = onFilterChanged;
-                gridOptionsTop.onSortChanged = onFilterChanged;
-                gridOptionsTop.onPaginationChanged= onFilterChanged;
-// code to  set date filter 
-      gridOptionsTop.columnDefs.forEach(ele =>{
-    if (ele["headerName"]=="Date")
-           {
-            ele["filter"]='agDateColumnFilter';
-            ele["filterParams"]= { 
-
-              comparator:function(filterLocalDateAtMidnight, cellValue) {
-            var dateAsString = cellValue;
-
-            if (dateAsString == null) {
-                return -1;
-            }
-
-            // In the example application, dates are stored as dd/mm/yyyy
-            // We create a Date object for comparison against the filter date
-            var dateParts = dateAsString.split('/');
-            var yy = Number(dateParts[2]);
-            var mm = Number(dateParts[1]) - 1;
-            var dd = Number(dateParts[0]);
-            var cellDate = new Date( yy, mm,dd);
-            if (filterLocalDateAtMidnight.getTime() == cellDate.getTime()) {
-                          return 0;
-                }
-
-            if (cellDate < filterLocalDateAtMidnight) {
-                          return -1;
-                }
-
-            if (cellDate > filterLocalDateAtMidnight) {
-                          return 1;
-                }
-            },
-      browserDatePicker: true,
-      buttons: ['reset', 'apply'],
-      debounceMs: 200 ,
-
-      }
-   }
-   
-            });   
-
-
-
-
+                //gridOptionsTop.onPaginationChanged = onPaginationChanged;
+                //gridOptionsTop.onSortChanged = onSortChanged;
                 gridOptionsTop.alignedGrids = [];
-  console.log(gridOptionsTop.columnDefs);
+console.log(gridOptionsTop.rowData);
+                // code to  set agDateColumnFilter on Date column  line 95 to  line 132
+                gridOptionsTop.columnDefs.forEach(ele => {
+                    if (ele["headerName"] == "Date") {
+                        ele["filter"] = 'agDateColumnFilter';
+                        ele["filterParams"] = {
+                            comparator: function(filterLocalDateAtMidnight, cellValue) {
+                                var dateAsString = cellValue;
+
+                                if (dateAsString == null) {
+                                    return -1;
+                                }
+
+                                // In the example application, dates are stored as dd/mm/yyyy
+                                // We create a Date object for comparison against the filter date
+                                var dateParts = dateAsString.split('/');
+                                var yy = Number(dateParts[2]);
+                                var mm = Number(dateParts[1]) - 1;
+                                var dd = Number(dateParts[0]);
+                                var cellDate = new Date(yy, mm, dd);
+                                if (filterLocalDateAtMidnight.getTime() == cellDate.getTime()) {
+                                    return 0;
+                                }
+
+                                if (cellDate < filterLocalDateAtMidnight) {
+                                    return -1;
+                                }
+
+                                if (cellDate > filterLocalDateAtMidnight) {
+                                    return 1;
+                                }
+                            },
+                            browserDatePicker: true,
+                            buttons: ['reset', 'apply'],
+                            debounceMs: 100,
+
+                        }
+                    }
+// string to  links  
+// new  code         start   **
+
+                     if(ele["headerName"] == "Clickable"){
+  
+                         ele['cellRenderer']= function(params) {
+                                        let keyData = params.data.Clickable;
+                                        let newLink = `<a href=${keyData} target="_blank">Click here</a>`;
+                                        return newLink;
+                                          }
+                      }
+
+// new  code         ends   **
+                });
+
+// date  sort  logic start
+             gridOptionsTop.columnDefs[0]['comparator']=dateComparator;
+ function dateComparator(date1, date2) {
+  var date1Number = monthToComparableNumber(date1);
+  var date2Number = monthToComparableNumber(date2);
+
+  if (date1Number === null && date2Number === null) {
+    return 0;
+  }
+  if (date1Number === null) {
+    return -1;
+  }
+  if (date2Number === null) {
+    return 1;
+  }
+
+  return date1Number - date2Number;
+}
+
+// eg 29/08/2004 gets converted to 20040829
+function monthToComparableNumber(date) {
+  if (date === undefined || date === null || date.length !== 10) {
+    return null;
+  }
+
+  var yearNumber = date.substring(6, 10);
+  var monthNumber = date.substring(3, 5);
+  var dayNumber = date.substring(0, 2);
+
+  var result = yearNumber * 10000 + monthNumber * 100 + dayNumber;
+  return result;
+}
+
+
+
+// date sort logic ends
+
+  
+
                 // creation of gridOptionsBottom
                 gridOptionsBottom.columnDefs = gridOptionsTop.columnDefs;
                 gridOptionsBottom.rowData = null;
@@ -145,47 +192,37 @@
                 gridOptionsBottom.alignedGrids = [];
 
 
-                //    console.log(data);
-
-
                 // making  alignedGrids   
                 gridOptionsTop.alignedGrids.push(gridOptionsBottom);
                 gridOptionsBottom.alignedGrids.push(gridOptionsTop);
-                // top Grid   
+
+                // top Grid   data  insert
                 var gridDivTop = document.querySelector('#myGridTop');
                 new agGrid.Grid(gridDivTop, gridOptionsTop);
-                onpageLoad();
-                //onFilterChanged() 
-                // bottom Grid     
+                onpageLoad(); // this function  main goal is SUM and create rowData array for Bottom Grid
+
+                // bottom Grid  data insert   
                 var gridDivBottom = document.querySelector('#myGridBottom');
                 new agGrid.Grid(gridDivBottom, gridOptionsBottom);
+        bugFixing()        
 
-
+ 
             }
 
         });
 
         function onpageLoad() {
 
-            var array = [];
-            //********** grid data  change focus  *****//
-            gridOptionsTop.api.forEachNodeAfterFilterAndSort(function(node) {
-                array.push(node.data);
+            var arrayLoad = [];
+//forEachNodeAfterFilterAndSort
+            gridOptionsTop.api.forEachNode(function(node) {
+                arrayLoad.push(node.data);
             });
-            
-// link mod start  
 
-            for(var i=0;i<array.length;i++){
-               $($('#myGridTop').find("[col-id=Clickable]")[i+1]).html("<a href= '"+array[i]["Clickable"]+"' target='_blank'> Click here </a>");
-              }
- //link new mod end        
-           
+          //  stringTolink(arrayLoad);
 
-
-         //   console.log('data in  filterchanged event ', array);
-            ///*****************************************************************//
-            // ********************find out numeric filters on top grid/////
             var totalArrayLable = [];
+
             gridOptionsTop["columnDefs"].forEach(function(ele) {
 
                 if (ele["filter"] == "agNumberColumnFilter") {
@@ -196,69 +233,64 @@
 
             });
 
-           // console.log("totalArrayLable", totalArrayLable)
-            //***********************************************************************//  
             var totalArraySUM = [];
             totalArrayLable.forEach(function(ele) {
-                totalArraySUM.push(array.reduce((sum, currentValue) => sum + currentValue[ele], 0))
+                totalArraySUM.push(arrayLoad.reduce((sum, currentValue) => sum + currentValue[ele], 0))
+            });
 
 
-            })
-            //console.log("totalArraySUM",totalArraySUM)
+            totalArraySUM = totalArraySUM.map(ele => ele ? ele : null);
 
-            totalArraySUM = totalArraySUM.map(ele => ele ? ele : null)
-            // data  for bottom 
-            ///*******************************************************************//
             var objArr = [];
             var obj = {};
+
             for (var i = 0; i < totalArraySUM.length; i++) {
                 objArr.push(gridOptionsBottom.columnDefs[i]["field"]);
-
                 if (i == 0) {
                     obj[objArr[i]] = "Total";
-                } else
+                } else {
                     obj[objArr[i]] = totalArraySUM[i]
+                }
+
 
             }
 
             totalArrayLable.push(obj);
-            //console.log("totalArrayLable",totalArrayLable)
-            // final object 
             var finalObj = totalArrayLable.pop();
-
             totalArrayLable = [];
             totalArrayLable.push(finalObj);
 
 
-          // console.log(totalArrayLable);
-              gridOptionsBottom.rowData = totalArrayLable;
-          //console.log( gridOptionsTop["columnDefs"]);
-          
+            gridOptionsBottom.rowData = totalArrayLable;
+            var col_id = Object.keys(finalObj);
+
+            console.log('# OnLoadChanged ');
+            for (var i = 0; i < col_id.length; i++) {
+             
+               $($('#myGridBottom').find("[col-id=" + '"' + col_id[i] + '"' + "]")[1]).html(finalObj[col_id[i]]); // $ for Bottom Grid to reset  sum after filter and sort
+              
+              }
+
+     //     $($('#myGridBottom').find("[col-id=Clickable]")[1]).html('')
+ console.log('# onpageLoad ')
+// console.log(gridOptionsTop.columnDefs)
+
         }
 
+        // onpageLoad() end here
 
 
         function onFilterChanged() {
 
-            var array = [];
+            var arrayFilter = [];
             //********** grid data  change focus  *****//
-            gridOptionsTop.api.forEachNodeAfterFilterAndSort(function(node) {
-                array.push(node.data);
+            gridOptionsTop.api.forEachNodeAfterFilter(function(node) {
+                arrayFilter.push(node.data);
             });
-
- // link mod start  
-
-            for(var i=0;i<array.length;i++){
-               $($('#myGridTop').find("[col-id=Clickable]")[i+1]).html("<a href= '"+array[i]["Clickable"]+"' target='_blank'> Click here </a>");
-              }
- //link new mod end        
-           
-
-
-       //     console.log('data in  filterchanged event ', array);
-            ///*****************************************************************//
-            // ********************find out numeric filters on top grid/////
             var totalArrayLable = [];
+
+           // stringTolink(arrayFilter);
+
             gridOptionsTop["columnDefs"].forEach(function(ele) {
 
                 if (ele["filter"] == "agNumberColumnFilter") {
@@ -269,56 +301,58 @@
 
             });
 
-          //  console.log("totalArrayLable", totalArrayLable)
-            //***********************************************************************//  
             var totalArraySUM = [];
             totalArrayLable.forEach(function(ele) {
-                totalArraySUM.push(array.reduce((sum, currentValue) => sum + currentValue[ele], 0))
-
-
+                totalArraySUM.push(arrayFilter.reduce((sum, currentValue) => sum + currentValue[ele], 0))
             })
-            //console.log("totalArraySUM",totalArraySUM)
 
             totalArraySUM = totalArraySUM.map(ele => ele ? ele : null)
-            // data  for bottom 
-            ///*******************************************************************//
+
             var objArr = [];
             var obj = {};
+
             for (var i = 0; i < totalArraySUM.length; i++) {
                 objArr.push(gridOptionsBottom.columnDefs[i]["field"]);
-
                 if (i == 0) {
                     obj[objArr[i]] = "Total";
-                } else
-                    obj[objArr[i]] = totalArraySUM[i]
+                } else {
+                    obj[objArr[i]] = totalArraySUM[i];
+                }
 
             }
 
             totalArrayLable.push(obj);
-            //console.log("totalArrayLable",totalArrayLable)
-            // final object 
             var finalObj = totalArrayLable.pop();
-
             totalArrayLable = [];
             totalArrayLable.push(finalObj);
 
+            //$($('#myGridBottom').find("[col-id=col_Id]")[1]).html();  //eg. Syntax
 
-           // console.log(totalArrayLable);
-              //$($('#myGridBottom').find("[col-id=col_Id]")[1]).html();
-              var col_id = Object.keys(finalObj);
-            //  console.log(col_id)
-              for(var i = 0; i< col_id.length;i++){
-            //      console.log(i,col_id[i],finalObj[col_id[i]])
-                $($('#myGridBottom').find("[col-id="+'"'+col_id[i]+'"'+"]")[1]).html(finalObj[col_id[i]])
-              }
-               
+            var col_id = Object.keys(finalObj);
+            console.log('# filter and sort ');
+            for (var i = 0; i < col_id.length; i++) {
+                console.log(col_id[i]);
+                    $($('#myGridBottom').find("[col-id=" + '"' + col_id[i] + '"' + "]")[1]).html(finalObj[col_id[i]]); // $ for Bottom Grid to reset  sum after filter and sort
+            }
+ 
+console.log('# onFilterChanged ')
+//console.log(gridOptionsTop.columnDefs)
         }
- 
-//console.log(gridOptionsTop.rowData)
+
+        // onFilterChanged() end here
+
+     
+
+// logic to fix Click here bug
+
+  function bugFixing(){
+console.log('bugFix');
+setTimeout(function(){$($('#myGridBottom').find("[col-id=Clickable]")[1]).html('');},200);
+    
+}
 
 
- 
-</script>
+    </script>
 
 
 

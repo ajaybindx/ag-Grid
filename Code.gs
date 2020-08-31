@@ -61,7 +61,9 @@ var columnDefs = columnDefsfn(data[0],data[1]);
                  resizable: true,
                  minWidth: 80,
                  flex: 1,
-                 filterParams: { buttons: ['reset', 'apply'],debounceMs: 200 }
+                 filterParams: { buttons: ['reset', 'apply'],debounceMs: 200 },
+                 sortable: true,
+                 filter: true
 
                    },
     rowData: rowData,
@@ -86,7 +88,7 @@ function columnDefsfn(colHd,sample)
 //var columndef=colHd.reduce((acc, cur) => ({ ...acc, [cur]: cur }), {})
  
 var columndef=[]
-  colHd.forEach(ele => columndef.push({ headerName:ele,field:ele,sortable: true,filter: true }));
+  colHd.forEach(ele => columndef.push({ headerName:ele,field:ele }));
 
 
   for(var i=0;i<columndef.length;i++){
