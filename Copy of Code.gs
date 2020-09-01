@@ -27,7 +27,7 @@ function myFunction() {
 
 var columnDefs = columnDefsfn(data[0],data[1]);
 
-  //console.log( `mark :` ,mark );
+  console.log( `mark :` ,mark );
 
 
   var final_array = [];
