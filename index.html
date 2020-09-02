@@ -7,6 +7,7 @@
     <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script>
     <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
     <!--script src="https://unpkg.com/@ag-grid-community/all-modules@23.2.0/dist/ag-grid-community.min.js"></script>-->
 
     <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css">
@@ -150,6 +151,39 @@ console.log(gridOptionsTop.columnDefs);
                       }
                     }
 // new  code         ends   **
+// status icon code start
+                    if(ele["headerName"] == "Status"){
+  
+                         ele['cellRenderer']= function(params) {
+                                    let keyData = params.data.Status;
+                                        keyData =keyData.replace(/(\s)/g, '');
+                                    var expression = /^[A-Za-z]+$/gi; 
+                                    var regEx = new RegExp(expression); 
+                                     if(  keyData.match(regEx) && keyData == "Approved" )
+                                         {
+                                            let status = `<i style='font-size:24px;color:green' class='fas'>&#xf164;</i>`;
+                                             return status;
+                                          }
+                                     else{
+                                          if(  keyData.match(regEx) && keyData == "Pending" )
+                                           {
+                                             let status = `<i style='font-size:24px;color:yellow' class='fas'>&#xf071;</i>`;
+                                             return status;
+                                            }
+                                          else {
+                                                if(  keyData.match(regEx) && keyData == "Rejected" )
+                                                {
+                                               let status = `<i  class='fas' style='font-size:24px;color:red'>&#xf165;</i>`;
+                                               return status;
+                                                 }
+                                             }
+                                          }
+                      }
+                    }
+
+
+
+// status icon code end
                 });
 
 // date  sort  logic start
