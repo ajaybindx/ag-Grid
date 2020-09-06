@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-alpine.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
-
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <style media="only screen">
         html,
         body {
@@ -44,6 +44,7 @@
 
 <body>
     <style>
+ 
         .bold-row {
             font-weight: bold;
         }
@@ -62,13 +63,68 @@
             flex: none;
             height: 60px;
         }
+       .example-header {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+.topnav {
+  overflow: hidden;
+  background-color: #e9e9e9;
+}
+
+
+
+.topnav .search-container {
+  float: left;
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+.topnav input[type=text] {
+  padding: 10px;
+  margin-top: 8px;
+  font-size: 17px;
+  border: none;
+}
+
+.topnav  {
+  float: right;
+  padding: 12px;
+  margin-top: 8px;
+  margin-right: 16px;
+  background: #ddd;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
+
+.topnav .search-container button:hover {
+  background: #ccc;
+}
+.btn {
+float: right;
+ margin-top: 8px;
+ margin-left: 12px;
+ margin-right: 12px;
+ 
+}
 
     </style>
 
 
     <div class="example-wrapper ag-theme-alpine">
-        <div id="myGridTop" class="top"></div>
-        <div id="myGridBottom" class="bottom"></div>
+           <div class="topnav">
+                <div class="search-container">
+                    <input type="text" id="filter-text-box"  placeholder="Search..." oninput="onFilterTextBoxChanged()"/> 
+                    <button type="button" class = "btn btn-default" id = 'PDF'  onclick="onBtPrint()" >Download As  PDF  <i class='fas fa-file-pdf' style="font-size:24px;color:red;"></i></button>
+                    <button type="button" class = "btn btn-default " id = 'csv'  onclick="onBtnCSVExport()" >Download As  CSV <i class='fas fa-file-csv' style="font-size:24px;color:green;"> </i></button> 
+                    <button type="button" class = "btn btn-default " id = 'sheet'style ="margin-left: 300px;" >Download As  Sheet <i class='fas fa-file-excel' style="font-size:24px;color:green;"> </i></button> 
+                    
+                </div>
+           </div>   
+                 <div id="myGridTop" class="top" ></div>
+                 <div id="myGridBottom" class="bottom"></div>
     </div>
 
 
@@ -77,7 +133,7 @@
 
         var gridOptionsTop = {};
         var gridOptionsBottom = {};
-
+        
 
         // this is the grid options for the bottom grid
         // setup the grid after the page has finished loading
@@ -88,7 +144,7 @@
             function onSuccess(data) {
                 // console.log(data)
                 gridOptionsTop = JSON.parse(data);
-
+               
                 gridOptionsTop.onFilterChanged = onFilterChanged;
                 //gridOptionsTop.onPaginationChanged = onPaginationChanged;
                 //gridOptionsTop.onSortChanged = onSortChanged;
@@ -252,6 +308,13 @@ function monthToComparableNumber(date) {
 
         });
 
+function onFilterTextBoxChanged() {
+    gridOptionsTop.api.setQuickFilter(document.getElementById('filter-text-box').value);
+}
+
+
+
+
         function onpageLoad() {
 
             var arrayLoad = [];
@@ -391,6 +454,60 @@ console.log('bugFix');
 setTimeout(function(){$($('#myGridBottom').find("[col-id=Clickable]")[1]).html('');},200);
     
 }
+  
+function onBtPrint() {
+  var gridApi = gridOptionsTop.api;
+
+  setPrinterFriendly(gridApi);
+
+  setTimeout(function() {
+    print();
+    setNormal(api);
+  }, 2000);
+}
+
+function setPrinterFriendly(api) {
+    
+   var eGridDiv = document.querySelector('#myGridTop');
+
+  api.setDomLayout('print');
+}
+
+function setNormal(api) {
+ var eGridDiv = document.querySelector('#myGridTop');
+  eGridDiv.style = 'display: flex;flex-direction: column;height: auto;';
+
+
+
+  api.setDomLayout(null);
+}
+
+
+// CSV logiv and Codes 
+
+function getParams() {
+  return {
+    suppressQuotes: 'none',
+    columnSeparator: 'none',
+    customHeader: 'none',
+    customFooter: 'none',
+  };
+}
+function onBtnCSVExport() {
+  var params = getParams();
+//  if (params.suppressQuotes || params.columnSeparator) {
+//    alert(
+//      'NOTE: you are downloading a file with non-standard quotes or separators - it may not render correctly in Excel.'
+//    );
+//  }
+ var CSV = gridOptionsTop.api.getDataAsCsv();
+gridOptionsTop.api.exportDataAsCsv();
+console.log(CSV);
+alert(CSV);
+
+}
+
+
 
 
     </script>

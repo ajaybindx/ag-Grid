@@ -6,17 +6,18 @@ function doGet(e) {
 var objArr= [];
 var mark = null;
  function test(){
- var ss = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+ var ss = SpreadsheetApp.openById(config.sheet_id).getSheetByName(config.sheet_name);
   var lr = ss.getLastRow();
   var lc = ss.getLastColumn();
   var range = lr + ":" + lc
 
   var data = ss.getDataRange().getValues();
- //console.log(data[1]);
+ console.log(data[1]);
+
 }
 function myFunction() {
 
-  var ss = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
+  var ss = SpreadsheetApp.openById(config.sheet_id).getSheetByName(config.sheet_name);
   var lr = ss.getLastRow();
   var lc = ss.getLastColumn();
   var range = lr + ":" + lc
@@ -27,7 +28,7 @@ function myFunction() {
 
 var columnDefs = columnDefsfn(data[0],data[1]);
 
-  //console.log( `mark :` ,mark );
+  console.log( `mark :` ,mark );
 
 
   var final_array = [];
