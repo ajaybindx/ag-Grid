@@ -46,6 +46,9 @@
 
 <body>
     <style>
+        .ag-watermark {
+          display:none;
+        }
         .bold-row {
             font-weight: bold;
         }
@@ -121,9 +124,9 @@
         <div class="topnav">
             <div class="search-container">
                 <input type="text" id="filter-text-box" placeholder="Search..." oninput="onFilterTextBoxChanged()" />
-                <button type="button" class="btn btn-default" id='PDF' onclick="addSubSheet()">Add sub Sheet <i class='fas fa-file-pdf' style="font-size:24px;color:red;"></i></button>
+                
                 <button type="button" class="btn btn-default" id='PDF' onclick="onBtPrint()">Download As PDF <i class='fas fa-file-pdf' style="font-size:24px;color:red;"></i></button>
-                <button type="button" class="btn btn-default " id='csv' onclick="onBtnCSVExport()">Download As CSV <i class='fas fa-file-csv' style="font-size:24px;color:green;"> </i></button>
+               
                 <button type="button" class="btn btn-default " id='sheet' onclick="onBtnSheetExport()" style="margin-left: 300px;">Download As Sheet <i class='fas fa-file-excel' style="font-size:24px;color:green;"> </i></button>
 
 
@@ -465,16 +468,7 @@
         }
 
         function onBtPrint() {
-            //  var gridApi = gridOptionsTop.api;
-            //
-            //  setPrinterFriendly(gridApi);
-            //
-            //  setTimeout(function() {
-            //    print();
-            //    setNormal(api);
-
-            //  }, 2000);
-
+           
             var colNames = gridOptionsTop["columnDefs"].map(ele => ele.field);
             console.log(colNames)
             console.log(dataGrid);
@@ -513,7 +507,7 @@
                for (var j = 0; j < colNames.length; j++) {
                doc.margins = 1;
                doc.setFont("times");
-               doc.setFontType("italic");
+               doc.setFontType("normal");
                doc.setFontSize(9);
                 doc.cell(2, 12, 35, 13, ele[colNames[j]].toString(), i);
                 }
@@ -541,16 +535,6 @@
         }
 
 
-        // CSV logiv and Codes 
-
-
-        function onBtnCSVExport() {
-
-            var CSV = gridOptionsTop.api.getDataAsCsv();
-            gridOptionsTop.api.exportDataAsCsv();
-            console.log(CSV);
-
-        }
 
 
         function onBtnSheetExport() {
@@ -560,12 +544,7 @@
         }
 
 
-        function addSubSheet() {
-
-            google.script.run.withSuccessHandler().subSheet();
-            console.log('subSheetAdded')
-        }
-
+  
     </script>
 
 
