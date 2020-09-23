@@ -16,7 +16,6 @@
     <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-alpine.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <style media="only screen">
         html,
@@ -48,9 +47,8 @@
 <body>
     <style>
         .ag-watermark {
-            display: none;
+          display:none;
         }
-
         .bold-row {
             font-weight: bold;
         }
@@ -120,47 +118,39 @@
         }
 
     </style>
-    <div id="title">
-        <h1 id='mytitle' style ="text-align: center"> </h1>
-    </div>
-   <div id='mainGrid'>
-    <div class="example-wrapper ag-theme-alpine" id='examplediv'  >
-        <div class="topnav" id='topnavdiv' >
-            <div class="search-container"  id='contenerdiv'>
+
+
+    <div class="example-wrapper ag-theme-alpine">
+        <div class="topnav">
+            <div class="search-container">
                 <input type="text" id="filter-text-box" placeholder="Search..." oninput="onFilterTextBoxChanged()" />
-                <button type="button" class="btn btn-default " id='refresh' onclick="refreshGrid()">  <i class="fa fa-refresh" style="font-size:24px;color:blue;"> </i></button>
+                <button type="button" class="btn btn-default" id='PDF' onclick="addSubSheet()">Add sub Sheet <i class='fas fa-file-pdf' style="font-size:24px;color:red;"></i></button>
                 <button type="button" class="btn btn-default" id='PDF' onclick="onBtPrint()">Download As PDF <i class='fas fa-file-pdf' style="font-size:24px;color:red;"></i></button>
                 <button type="button" class="btn btn-default " id='csv' onclick="onBtnCSVExport()">Download As CSV <i class='fas fa-file-csv' style="font-size:24px;color:green;"> </i></button>
                 <button type="button" class="btn btn-default " id='sheet' onclick="onBtnSheetExport()" style="margin-left: 300px;">Download As Sheet <i class='fas fa-file-excel' style="font-size:24px;color:green;"> </i></button>
- 
+
+
             </div>
         </div>
         <div id="myGridTop" class="top"></div>
         <div id="myGridBottom" class="bottom"></div>
     </div>
-   
-</div>
 
-  <script type="text/javascript">
+
+    <script type="text/javascript">
         //console.log($);
 
         var gridOptionsTop = {};
         var gridOptionsBottom = {};
         var dataGrid = [];
-        var title ='';
-      
-       
-           
 
-        function refreshTheData(){
-              google.script.run.withSuccessHandler(setTitle).info();
-               function setTitle(data){
-                    title = JSON.parse(data);
-                     $('#mytitle').append(title);  
 
-                  }
+        // this is the grid options for the bottom grid
+        // setup the grid after the page has finished loading
+        document.addEventListener('DOMContentLoaded', function() {
+
             google.script.run.withSuccessHandler(onSuccess).myFunction();
-            
+
             function onSuccess(data) {
                 // console.log(data)
                 gridOptionsTop = JSON.parse(data);
@@ -319,18 +309,14 @@
 
             }
 
-        }
-
-        // this is the grid options for the bottom grid
-        // setup the grid after the page has finished loading
-        document.addEventListener('DOMContentLoaded', function() {
-            refreshTheData();
-            
         });
 
         function onFilterTextBoxChanged() {
             gridOptionsTop.api.setQuickFilter(document.getElementById('filter-text-box').value);
         }
+
+
+
 
         function onpageLoad() {
 
@@ -482,6 +468,15 @@
         }
 
         function onBtPrint() {
+            //  var gridApi = gridOptionsTop.api;
+            //
+            //  setPrinterFriendly(gridApi);
+            //
+            //  setTimeout(function() {
+            //    print();
+            //    setNormal(api);
+
+            //  }, 2000);
 
             var colNames = gridOptionsTop["columnDefs"].map(ele => ele.field);
             console.log(colNames)
@@ -489,15 +484,15 @@
 
             var doc = new jsPDF();
             var l = {
-                orientation: 'l',
-                unit: 'mm',
-                format: 'a3',
-                compress: true,
-                fontSize: 8,
-                lineHeight: 1,
-                autoSize: false,
-                printHeaders: true
-            };
+                    orientation: 'l',
+                    unit: 'mm',
+                    format: 'a3',
+                    compress: true,
+                    fontSize: 8,
+                    lineHeight: 1,
+                    autoSize: false,
+                    printHeaders: true
+                };
 
             var doc = new jsPDF(l, '', '', '');
 
@@ -509,21 +504,21 @@
                 creator: 'author'
             });
             doc.cellInitialize();
-            colNames.forEach(function(ele, i) {
-                doc.margins = 1;
-                doc.setFont("helvetica");
-                doc.setFontType("bold");
-                doc.setFontSize(9);
-                doc.cell(2, 12, 35, 13, ele, 1);
+            colNames.forEach(function(ele, i){
+            doc.margins = 1;
+            doc.setFont("helvetica");
+            doc.setFontType("bold");
+            doc.setFontSize(9);
+            doc.cell(2, 12, 35, 13, ele, 1);
             });
-
+            
             dataGrid.forEach(function(ele, i) {
-                for (var j = 0; j < colNames.length; j++) {
-                    doc.margins = 1;
-                    doc.setFont("times");
-                    doc.setFontType("normal");
-                    doc.setFontSize(9);
-                    doc.cell(2, 12, 35, 13, ele[colNames[j]].toString(), i);
+               for (var j = 0; j < colNames.length; j++) {
+               doc.margins = 1;
+               doc.setFont("times");
+               doc.setFontType("normal");
+               doc.setFontSize(9);
+                doc.cell(2, 12, 35, 13, ele[colNames[j]].toString(), i);
                 }
             });
             doc.save('grid.pdf');
@@ -549,6 +544,9 @@
         }
 
 
+        // CSV logiv and Codes 
+
+
         function onBtnCSVExport() {
 
             var CSV = gridOptionsTop.api.getDataAsCsv();
@@ -557,44 +555,19 @@
 
         }
 
+
         function onBtnSheetExport() {
-            gridOptionsTop.api.exportDataAsExcel({sheetName:'records'});
+
+            gridOptionsTop.api.exportDataAsExcel();
+
         }
 
 
- function refreshGrid(){
+        function addSubSheet() {
 
-$('#title').remove();
-$('#mainGrid').remove();
-
-$(`<div id="title">
-        <h1 id='mytitle' style ="text-align: center"> </h1>
-    </div>
-    <div id='mainGrid'>
-     <div class="example-wrapper ag-theme-alpine" id='examplediv'  >
-        <div class="topnav" id='topnavdiv' >
-            <div class="search-container" id='contenerdiv'>
-                <input type="text" id="filter-text-box" placeholder="Search..." oninput="onFilterTextBoxChanged()" />
-                <button type="button" class="btn btn-default " id='refresh' onclick="refreshGrid()">  <i class="fa fa-refresh" style="font-size:24px;color:blue;"> </i></button>
-                <button type="button" class="btn btn-default" id='PDF' onclick="onBtPrint()">Download As PDF <i class='fas fa-file-pdf' style="font-size:24px;color:red;"></i></button>
-                <button type="button" class="btn btn-default " id='csv' onclick="onBtnCSVExport()">Download As CSV <i class='fas fa-file-csv' style="font-size:24px;color:green;"> </i></button>
-                <button type="button" class="btn btn-default " id='sheet' onclick="onBtnSheetExport()" style="margin-left: 300px;">Download As Sheet <i class='fas fa-file-excel' style="font-size:24px;color:green;"> </i></button>
- 
-            </div>
-        </div>
-        <div id="myGridTop" class="top"></div>
-        <div id="myGridBottom" class="bottom"></div>
-    </div>
-</div>`).appendTo("body");
-
-
- refreshTheData();
-
-
-
-}
-
-
+            google.script.run.withSuccessHandler().subSheet();
+            console.log('subSheetAdded')
+        }
 
     </script>
 
